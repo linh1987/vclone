@@ -1,38 +1,46 @@
-<html> 
-    <head>
-        <title>Vclone testing ground</title>
-    </head>
-    <body>
-        <div id="app"></div>
-        <script src="dist/bundle.js" ></script>
-        <script> 
-            console.log(vclone);
-            var e = vclone.createElement;
-            var div = function (prop, children) {
-                return e('div', prop, children);
-            }
+<html>
 
-            var span = function (prop, children) {
-                return e('span', prop, children);
-            }
-            
-            var weatherWidget = function (prop) {
-                return div({ className: 'col-md-6 col-sm-6 col-xs-12' },
-                    [
-                        span({}, [
-                            "test",
-                            e('br'),
-                            e('i', {}, ("description"))
-                        ])
-                    ]
-                );
-            };
-            var render = function () {
-                vclone.render(e(weatherWidget),
-                    document.getElementById("app"));
-            };
+<head>
+    <title>Vclone testing ground</title>
+</head>
 
-            render();
-        </script>
-    </body>
+<body>
+    <div id="app"></div>
+    <script src="dist/bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno/3.9.0/inferno.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno-create-element/3.9.0/inferno-create-element.min.js"></script>
+    <script>
+        console.log(vclone);
+        var e = vclone.createElement;
+        var r = vclone.render;
+        //var e = Inferno.createElement;
+        //var r = Inferno.render;
+        var div = function (prop, children) {
+            return e('div', prop, children);
+        }
+
+        var span = function (prop, children) {
+            return e('span', prop, children);
+        }
+
+        var weatherWidget = function (prop) {
+            return div({ className: 'col-md-6 col-sm-6 col-xs-12' },
+                [
+                    span({}, [
+                        "test",
+                        e('br'),
+                        e('i', {}, ("description"))
+                    ])
+                ]
+            );
+        };
+        var render = function () {
+            r(e(weatherWidget),
+                document.getElementById("app"));
+        };
+
+        render();
+    </script>
+</body>
+
 </html>
