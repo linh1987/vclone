@@ -1,0 +1,19 @@
+{
+  "name": "vclone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup index.js --o dist/bundle.js --f iife --name \"vclone\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@bitbucket.niteco.se:7999/fet/vclone.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "rollup": "^0.49.3"
+  }
+}
