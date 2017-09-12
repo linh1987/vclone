@@ -2,44 +2,57 @@
 
 <head>
     <title>Vclone testing ground</title>
+    <style>
+        .appWrapper {
+            width: 48%;
+            border: 1px solid #fff;
+            box-shadow: 0 0 1px rgba(0,0,0,0.2);
+            float: left;
+            min-height: 100px;
+            margin-right: 5px;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="app"></div>
+    <div class="appWrapper" id="app"></div>
+    <div class="appWrapper" id="InfernoApp"></div>
+
     <script src="dist/bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno/3.9.0/inferno.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno-create-element/3.9.0/inferno-create-element.min.js"></script>
     <script>
         console.log(vclone);
-        var e = vclone.createElement;
-        var r = vclone.render;
-        //var e = Inferno.createElement;
-        //var r = Inferno.render;
-        var div = function (prop, children) {
-            return e('div', prop, children);
-        }
 
-        var span = function (prop, children) {
-            return e('span', prop, children);
-        }
+        var render = function (e, r, id) {
+            var div = function (prop, children) {
+                return e('div', prop, children);
+            }
 
-        var weatherWidget = function (prop) {
-            return div({ className: 'col-md-6 col-sm-6 col-xs-12' },
-                [
-                    span({}, [
-                        "test",
-                        e('br'),
-                        e('i', {}, ("description"))
-                    ])
-                ]
-            );
-        };
-        var render = function () {
+            var span = function (prop, children) {
+                return e('span', prop, children);
+            }
+
+            var weatherWidget = function (prop) {
+                return div({ className: 'col-md-6 col-sm-6 col-xs-12' },
+                    [
+                        span({}, [
+                            "test",
+                            e('br'),
+                            e('i', {}, ("description"))
+                        ])
+                    ]
+                );
+            };
+
             r(e(weatherWidget),
-                document.getElementById("app"));
+                document.getElementById(id));
         };
 
-        render();
+
+
+        render(vclone.createElement, vclone.render, "app");
+        render(Inferno.createElement, Inferno.render, "InfernoApp");
     </script>
 </body>
 

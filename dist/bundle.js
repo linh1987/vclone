@@ -5,10 +5,11 @@ var vclone = (function (exports) {
 function empty(node) {
     [].slice.call(node.childNodes).forEach(node.removeChild, node);
 }
+//# sourceMappingURL=DOM.js.map
 
 var createElement = function (tag, props, children) {
     console.log('createElement: ' + tag);
-    throw "Not implemented";
+    return null;
 };
 var render = function (vdom, el) {
     empty(el);
