@@ -21,10 +21,29 @@
     <script src="dist/bundle.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno/3.9.0/inferno.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno-create-element/3.9.0/inferno-create-element.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno-component/3.9.0/inferno-component.min.js"></script>
     <script>
-        console.log(vclone);
+        var render = function (e, r, Component, id) {
+            class TestComponent extends Component {
+                render() {
+                    return div({}, [
+                        span({}, [
+                            this.props.title
+                        ]),
+                        span({}, [
+                            'more child',
+                            'even more child'
+                        ])
+                    ])
+                }
+            }
 
-        var render = function (e, r, id) {
+            class TestContainer extends Component {
+                render() {
+                    return div({}, this.props.children)
+                }
+            }
+
             var div = function (prop, children) {
                 return e('div', prop, children);
             }
@@ -45,6 +64,10 @@
                 );
             };
 
+            var button = function (prop) {
+                return e('button', prop);
+            }
+
             var weatherWidget = function (prop) {
                 return div({ className: 'col-md-6 col-sm-6 col-xs-12' },
                     [
@@ -52,7 +75,10 @@
                             "test",
                             e('br'),
                             e('i', {}, ["description"])
-                        ])
+                        ]),
+                        e(TestComponent, { title: 'blah blah title blah blah' }),
+                        e(TestContainer, {}, e('i', {}, ["container child"])),
+                        button({ onClick: () => alert('YOU DID IT!') })
                     ]
                 );
             };
@@ -62,9 +88,17 @@
         }
 
 
-
-        render(vclone.createElement, vclone.render, "app");
-        render(Inferno.createElement, Inferno.render, "InfernoApp");
+        try {
+            render(vclone.createElement, vclone.render, vclone.Component, "app");
+        } catch (error) {
+            console.log(error)
+        }
+        
+        try {
+            render(Inferno.createElement, Inferno.render, Inferno.Component, "InfernoApp");
+        } catch (error) {
+            console.log(error)
+        }
     </script>
 </body>
 

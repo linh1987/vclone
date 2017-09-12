@@ -1,41 +1,33 @@
 import * as DOM from './DOM'
+import VNode from './VNode'
+import Component from './Component'
 
-class VNode {
-    
-    renderedDom: Element
 
-    constructor(dom : Element) {
-        console.log('creating ' + JSON.stringify(dom));
-        this.renderedDom = dom;
-    }
-}
+var createElement = function (type: string | Function | Component, props: any, children: (VNode | string)[] | string): VNode {
+    props = props || {};
+    props.children = children;
 
-export const createElement = function (tag: string | Function, props: any, children: (VNode| string)[]): VNode {
-    if (typeof tag === 'string') {
-        let renderedDOM: Element = null;
-        console.log('creating [' + tag + ']');
-        renderedDOM = document.createElement(tag);
-
-        if (children && children.forEach) {
-            children.forEach((child) => {
-                if (typeof child === 'string') {
-                    const wrapper = document.createElement('span');
-                    wrapper.textContent = child
-                    renderedDOM.appendChild(wrapper)
-                } else {
-                    renderedDOM.appendChild(child.renderedDom);
-                }
-            })
+    if (typeof type === 'string')
+        return new VNode(type, props, children);
+    else if (typeof type === 'function') { 
+        const composedNode = new (type as any)(props);
+        if (composedNode instanceof VNode) {
+            return composedNode;
+        } else if (composedNode instanceof Component) {
+            return composedNode.render()
         }
+    }
 
-        return new VNode(renderedDOM);
-    }
-    else if (typeof tag === 'function') {
-        return tag();
-    }
+    throw "unknown type supplied: " + type;
 }
 
-export const render = function (vdom: VNode, el: Element) {
+var render = function (vdom: VNode, el: Element) {
     DOM.empty(el);
-    el.appendChild(vdom.renderedDom);
+    el.appendChild(vdom.renderAsDOM());
 }
+
+export { 
+    Component,
+    render, 
+    createElement
+};
