@@ -64,8 +64,8 @@
                     );
                 };
     
-                var button = function (prop) {
-                    return e('button', prop);
+                var button = function (prop, children) {
+                    return e('button', prop, children);
                 }
     
                 var weatherWidget = function (prop) {
@@ -78,7 +78,7 @@
                             ]),
                             e(TestComponent, { title: 'blah blah title blah blah' }),
                             e(TestContainer, {}, e('i', {}, ["container child"])),
-                            button({ onClick: () => alert('YOU DID IT!') })
+                            button({ onClick: () => alert('YOU DID IT!') }, 'Save me!')
                         ]
                     );
                 };
