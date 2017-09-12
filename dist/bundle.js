@@ -5,7 +5,6 @@ var vclone = (function (exports) {
 function empty(node) {
     [].slice.call(node.childNodes).forEach(node.removeChild, node);
 }
-//# sourceMappingURL=DOM.js.map
 
 var VNode = (function () {
     function VNode(dom) {
