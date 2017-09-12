@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup index.js --o dist/bundle.js --f iife --name \"vclone\""
+    "build": "rollup src/index.js --o dist/bundle.js --f iife --name \"vclone\""
   },
   "repository": {
     "type": "git",
