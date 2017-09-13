@@ -12,6 +12,7 @@ var VNode = (function () {
     }
     return VNode;
 }());
+
 var createElement = function (tag, props, children) {
     var renderedDOM = null;
     if (typeof tag === 'string') {

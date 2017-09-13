@@ -1,19 +1,13 @@
 import * as DOM from './DOM'
+import VNode from './VNode'
 
-class VNode {
-    renderedDOM: Element;
 
-    constructor(el: Element) {
-        this.renderedDOM = el;
-    }
-}
-
-export var createElement = function (tag: string | Function, props: any, children: (VNode | string)[] | string): VNode {
+export var createElement = function (tag: string | Function : component, props: any, children: (VNode | string)[] | string | VNode): VNode {
     let renderedDOM: Element = null;
 
     if (typeof tag === 'string') {
         renderedDOM = document.createElement(tag);
-        if (typeof children === 'string')
+        if (typeof children === 'string' || children instanceof VNode)
             children = [children];
         
         if (children) {
