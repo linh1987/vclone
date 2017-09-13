@@ -7,6 +7,16 @@ function empty(node) {
 }
 //# sourceMappingURL=DOM.js.map
 
+function mapEvent(eventName) {
+    switch (eventName.toLowerCase()) {
+        case 'onclick':
+            return 'click';
+        default:
+            return 'unknown';
+    }
+}
+//# sourceMappingURL=Events.js.map
+
 var VNode = (function () {
     function VNode(type, props, children) {
         this.type = type;
@@ -14,8 +24,23 @@ var VNode = (function () {
         this.children = children;
     }
     VNode.prototype.renderAsDOM = function () {
+        var _this = this;
         var renderedDOM = null;
         renderedDOM = document.createElement(this.type);
+        Object.keys(this.props).forEach(function (key) {
+            var currentKey = key;
+            var currentValue = _this.props[key];
+            if (currentKey === 'children')
+                return;
+            if (currentKey === 'className')
+                currentKey = 'class';
+            if (typeof currentValue === 'function') {
+                renderedDOM.addEventListener(mapEvent(currentKey), currentValue);
+            }
+            else {
+                renderedDOM.setAttribute(currentKey, currentValue);
+            }
+        });
         if (!this.children)
             this.children = [];
         if (typeof this.children === 'string' || this.children instanceof VNode)

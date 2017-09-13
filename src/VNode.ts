@@ -1,3 +1,4 @@
+import { mapEvent } from './Events'
 export default class VNode {
     renderedDOM: Element;
     type: string;
@@ -14,6 +15,26 @@ export default class VNode {
         let renderedDOM: Element = null;
 
         renderedDOM = document.createElement(this.type);
+
+        Object.keys(this.props).forEach((key) => {
+            let currentKey = key;
+            let currentValue = this.props[key];
+
+            if (currentKey === 'children') 
+                return;
+
+            if (currentKey === 'className')
+                currentKey = 'class';
+            
+
+            if (typeof currentValue === 'function') {
+                renderedDOM.addEventListener(mapEvent(currentKey), currentValue);
+            }
+            else {
+                renderedDOM.setAttribute(currentKey, currentValue)
+            }
+        });
+
         if (!this.children)
             this.children = [];
             
