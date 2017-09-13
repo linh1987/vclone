@@ -6,62 +6,92 @@ function empty(node) {
     [].slice.call(node.childNodes).forEach(node.removeChild, node);
 }
 
+function mapEvent(eventName) {
+    switch (eventName.toLowerCase()) {
+        case 'onclick':
+            return 'click';
+        default:
+            return 'unknown';
+    }
+}
+
+var VNode = (function () {
+    function VNode(type, props, children) {
+        this.type = type;
+        this.props = props;
+        this.children = children;
+    }
+    VNode.prototype.renderAsDOM = function () {
+        var _this = this;
+        var renderedDOM = null;
+        renderedDOM = document.createElement(this.type);
+        Object.keys(this.props).forEach(function (key) {
+            var currentKey = key;
+            var currentValue = _this.props[key];
+            if (currentKey === 'children')
+                return;
+            if (currentKey === 'className')
+                currentKey = 'class';
+            if (typeof currentValue === 'function') {
+                renderedDOM.addEventListener(mapEvent(currentKey), currentValue);
+            }
+            else {
+                renderedDOM.setAttribute(currentKey, currentValue);
+            }
+        });
+        if (!this.children)
+            this.children = [];
+        if (typeof this.children === 'string' || this.children instanceof VNode)
+            this.children = [this.children];
+        this.children.forEach(function (child) {
+            var el = null;
+            if (typeof child === 'string') {
+                var spanWrapper = document.createElement('span');
+                spanWrapper.textContent = child;
+                el = spanWrapper;
+            }
+            else {
+                el = child.renderAsDOM();
+            }
+            renderedDOM.appendChild(el);
+        });
+        return renderedDOM;
+    };
+    return VNode;
+}());
+
 var Component = (function () {
     function Component(props) {
         this.props = null;
         this.props = props;
     }
-    Component.prototype.render = function () {
-        throw "Not implemented";
-    };
     return Component;
 }());
 
-var VNode = (function () {
-    function VNode(el) {
-        this.renderedDOM = el;
-    }
-    return VNode;
-}());
-
 var createElement = function (type, props, children) {
-    var renderedDOM = null;
-    if (typeof type === 'string') {
-        renderedDOM = document.createElement(type);
-        if (typeof children === 'string' || children instanceof VNode)
-            children = [children];
-        if (children) {
-            children.forEach(function (child) {
-                var el = null;
-                if (typeof child === 'string') {
-                    var spanWrapper = document.createElement('span');
-                    spanWrapper.textContent = child;
-                    el = spanWrapper;
-                }
-                else {
-                    el = child.renderedDOM;
-                }
-                renderedDOM.appendChild(el);
-            });
-        }
-        return new VNode(renderedDOM);
-    }
+    props = props || {};
+    props.children = children;
+    if (typeof type === 'string')
+        return new VNode(type, props, children);
     else if (typeof type === 'function') {
-        var tempInstance = new type(props);
-        if (tempInstance instanceof VNode)
-            return tempInstance;
-        else if (tempInstance instanceof Component)
-            return tempInstance.render();
+        var composedNode = new type(props);
+        if (composedNode instanceof VNode) {
+            return composedNode;
+        }
+        else if (composedNode instanceof Component) {
+            return composedNode.render();
+        }
     }
+    throw "unknown type supplied: " + type;
 };
 var render = function (vdom, el) {
     empty(el);
-    el.appendChild(vdom.renderedDOM);
+    el.appendChild(vdom.renderAsDOM());
 };
 
+exports.Component = Component;
 exports.render = render;
 exports.createElement = createElement;
-exports.Component = Component;
 
 return exports;
 

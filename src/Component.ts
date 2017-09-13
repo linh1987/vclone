@@ -1,13 +1,11 @@
-import VNode from './VNode'
+import VNode from './VNode';
 
-export default class Component {
-    props : any = null;
-    
-    constructor (props : any) {
+export default abstract class Component {
+    props: any = null;
+
+    constructor(props) {
         this.props = props;
     }
 
-    render() : VNode { 
-        throw "Not implemented";
-    }
+    abstract render() : VNode;
 }
