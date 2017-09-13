@@ -6,6 +6,17 @@ function empty(node) {
     [].slice.call(node.childNodes).forEach(node.removeChild, node);
 }
 
+var Component = (function () {
+    function Component(props) {
+        this.props = null;
+        this.props = props;
+    }
+    Component.prototype.render = function () {
+        throw "Not implemented";
+    };
+    return Component;
+}());
+
 var VNode = (function () {
     function VNode(el) {
         this.renderedDOM = el;
@@ -13,11 +24,11 @@ var VNode = (function () {
     return VNode;
 }());
 
-var createElement = function (tag, props, children) {
+var createElement = function (type, props, children) {
     var renderedDOM = null;
-    if (typeof tag === 'string') {
-        renderedDOM = document.createElement(tag);
-        if (typeof children === 'string')
+    if (typeof type === 'string') {
+        renderedDOM = document.createElement(type);
+        if (typeof children === 'string' || children instanceof VNode)
             children = [children];
         if (children) {
             children.forEach(function (child) {
@@ -35,8 +46,12 @@ var createElement = function (tag, props, children) {
         }
         return new VNode(renderedDOM);
     }
-    else if (typeof tag === 'function') {
-        return tag();
+    else if (typeof type === 'function') {
+        var tempInstance = new type(props);
+        if (tempInstance instanceof VNode)
+            return tempInstance;
+        else if (tempInstance instanceof Component)
+            return tempInstance.render();
     }
 };
 var render = function (vdom, el) {
@@ -44,8 +59,9 @@ var render = function (vdom, el) {
     el.appendChild(vdom.renderedDOM);
 };
 
-exports.createElement = createElement;
 exports.render = render;
+exports.createElement = createElement;
+exports.Component = Component;
 
 return exports;
 

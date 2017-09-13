@@ -2,12 +2,11 @@ import * as DOM from './DOM'
 import Component from './Component'
 import VNode from './VNode'
 
-
-export var createElement = function (tag: string | Function | Component, props: any, children: (VNode | string)[] | string | VNode): VNode {
+var createElement = function (type: string | Function | Component, props: any, children: (VNode | string)[] | string | VNode): VNode {
     let renderedDOM: Element = null;
 
-    if (typeof tag === 'string') {
-        renderedDOM = document.createElement(tag);
+    if (typeof type === 'string') {
+        renderedDOM = document.createElement(type);
         if (typeof children === 'string' || children instanceof VNode)
             children = [children];
         
@@ -27,12 +26,22 @@ export var createElement = function (tag: string | Function | Component, props: 
             })
         }
         return new VNode(renderedDOM);
-    } else if (typeof tag === 'function') {
-        return tag();
+    } else if (typeof type === 'function') {
+        var tempInstance = new (type as any)(props);
+
+        if (tempInstance instanceof VNode)
+            return tempInstance;
+        else if (tempInstance instanceof Component)
+            return tempInstance.render();
     }
 }
 
-export var render = function (vdom: VNode, el: Element) {
+var render = function (vdom: VNode, el: Element) {
     DOM.empty(el);
     el.appendChild(vdom.renderedDOM);
+}
+
+
+export {
+    render, createElement, Component
 }

@@ -1,10 +1,10 @@
 import VNode from './VNode'
 
 export default class Component {
-    prop : any = null;
+    props : any = null;
     
-    constructor (prop : any) {
-        this.prop = prop;
+    constructor (props : any) {
+        this.props = props;
     }
 
     render() : VNode { 
