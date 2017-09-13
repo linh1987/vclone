@@ -1,8 +1,9 @@
 import * as DOM from './DOM'
+import Component from './Component'
 import VNode from './VNode'
 
 
-export var createElement = function (tag: string | Function : component, props: any, children: (VNode | string)[] | string | VNode): VNode {
+export var createElement = function (tag: string | Function | Component, props: any, children: (VNode | string)[] | string | VNode): VNode {
     let renderedDOM: Element = null;
 
     if (typeof tag === 'string') {
