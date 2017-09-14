@@ -1,11 +1,45 @@
 import VNode from './VNode';
 
-export default abstract class Component {
+class Component {
     props: any = null;
+    state: any = null;
+    node: VNode = null;
+    isComponentClass: boolean = true;
 
     constructor(props) {
-        this.props = props;
+        this.props = props; 
     }
 
-    abstract render() : VNode;
+    setState(nextState) {
+        this.state = nextState;
+        // this.updateComponent();
+    }
+    
+    mountComponent() : Element {
+        let node = this.render();
+        this.node = node;
+
+        return node.mount();
+    }
+
+    updateComponent() {
+        
+        let newNode = this.render();
+        console.log(newNode);
+        console.log(this.node);
+        if (newNode.type !== this.node.type) {
+            console.log('reseting type');
+            this.node.dom.replaceWith(newNode.mount())
+        } else {
+            console.log('updating dom');
+            this.node.update(newNode.props, newNode.children)
+        }
+        
+    }
+
+    render(): VNode {
+        throw "Not implemented exception";
+    }
 }
+
+export { Component }

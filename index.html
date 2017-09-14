@@ -1,108 +1,119 @@
 <html>
-    
-    <head>
-        <title>Vclone testing ground</title>
-        <style>
-            .appWrapper {
-                width: 48%;
-                border: 1px solid #fff;
-                box-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
-                float: left;
-                min-height: 100px;
-                margin-right: 5px;
+
+<head>
+    <title>Vclone testing ground</title>
+    <style>
+        .appWrapper {
+            width: 48%;
+            border: 1px solid #fff;
+            box-shadow: 0 0 1px rgba(0, 0, 0, 0.2);
+            float: left;
+            min-height: 100px;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="appWrapper" id="app"></div>
+    <div class="appWrapper" id="InfernoApp"></div>
+
+    <script src="dist/bundle.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno/3.9.0/inferno.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno-create-element/3.9.0/inferno-create-element.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno-component/3.9.0/inferno-component.min.js"></script>
+    <script>
+        var render = function (e, r, Component, id) {
+
+            class ToggleComponent extends Component {
+                constructor(props) {
+                    super(props);
+                    this.state = {toggled: false};
+                }
+
+                render() {
+                    if (this.state.toggled === false) {
+                        return div({}, ['this is a div', button({onClick: () => this.setState({toggled: true})}, 'switch to span')]);
+                    }
+
+                    else return span({}, 'this is a span')
+                }
             }
-        </style>
-    </head>
-    
-    <body>
-        <div class="appWrapper" id="app"></div>
-        <div class="appWrapper" id="InfernoApp"></div>
-    
-        <script src="dist/bundle.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno/3.9.0/inferno.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno-create-element/3.9.0/inferno-create-element.min.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno-component/3.9.0/inferno-component.min.js"></script>
-        <script>
-            var render = function (e, r, Component, id) {
-                class TestComponent extends Component {
-                    constructor(props) {
-                        super(props)
-                        this.state = { count: 1 }
-                    }
-    
-                    increase() {
-                        this.setState({
-                            count: this.state.count + 1
-                        })
-                    }
-    
-                    render() {
-                        return div({}, [
+            
+            class TestComponent extends Component {
+                constructor(props) {
+                    super(props)
+                    this.state = { count: 1 }
+                }
+
+                increase() {
+                    this.setState({
+                        count: this.state.count + 1
+                    })
+                }
+
+                render() {
+                    return div({}, [
+                        span({}, [
+                            this.props.title
+                        ]),
+                        span({}, [
+                            'current count: ' + this.state.count,
+                        ]),
+                        button({ onClick: () => this.increase() }, ['click for awesomeness'])
+                    ])
+                }
+            }
+
+            var div = function (prop, children) {
+                return e('div', prop, children);
+            }
+
+            var span = function (prop, children) {
+                return e('span', prop, children);
+            }
+
+            var button = function (prop, children) {
+                return e('button', prop, children);
+            }
+
+            class weatherWidget extends Component {
+                arbitraryUpdatingState() {
+                    this.setState({})
+                }
+                render() {
+                    return div({ className: 'col-md-6 col-sm-6 col-xs-12' },
+                        [
                             span({}, [
-                                this.props.title
+                                "test",
+                                e('br'),
+                                e('i', {}, ["description"])
                             ]),
-                            span({}, [
-                                'current count: ' + this.state.count,
-                            ]),
-                            button({ onClick: () => this.increase() }, ['click for awesomeness'])
-                        ])
-                    }
+                            e(TestComponent, { title: 'blah blah title blah blah' }),
+                            e(TestContainer, {}, e('i', {}, ["container child"])),
+                            button({ onClick: () => this.arbitraryUpdatingState() }, 'Update whole component'),
+                            e(ToggleComponent)
+                        ]
+                    );
                 }
-    
-                class TestContainer extends Component {
-                    render() {
-                        return div({}, this.props.children)
-                    }
-                }
-    
-                var div = function (prop, children) {
-                    return e('div', prop, children);
-                }
-    
-                var span = function (prop, children) {
-                    return e('span', prop, children);
-                }
-    
-                var button = function (prop, children) {
-                    return e('button', prop, children);
-                }
-    
-                class weatherWidget extends Component {
-                    arbitraryUpdatingState() {
-                        this.setState({})
-                    }
-                    render() {
-                        return div({ className: 'col-md-6 col-sm-6 col-xs-12' },
-                            [
-                                span({}, [
-                                    "test",
-                                    e('br'),
-                                    e('i', {}, ["description"])
-                                ]),
-                                e(TestComponent, { title: 'blah blah title blah blah' }),
-                                e(TestContainer, {}, e('i', {}, ["container child"])),
-                                button({ onClick: () => this.arbitraryUpdatingState() }, 'Update whole component')
-                            ]
-                        );
-                    }
-                }
-                r(e(weatherWidget),
-                    document.getElementById(id));
             }
-    
-    
-            try {
-                render(vclone.createElement, vclone.render, vclone.Component, "app");
-            } catch (error) {
-                console.log(error)
-            }
-    
-            try {
-                render(Inferno.createElement, Inferno.render, Inferno.Component, "InfernoApp");
-            } catch (error) {
-                console.log(error)
-            }
-        </script>
-    </body>
-    
-    </html>
+            r(e(weatherWidget),
+                document.getElementById(id));
+        }
+
+
+        try {
+            render(vclone.createElement, vclone.render, vclone.Component, "app");
+        } catch (error) {
+            console.log(error)
+        }
+
+        try {
+            render(Inferno.createElement, Inferno.render, Inferno.Component, "InfernoApp");
+        } catch (error) {
+            console.log(error)
+        }
+    </script>
+</body>
+
+</html>
