@@ -25,15 +25,26 @@
     <script>
         var render = function (e, r, Component, id) {
             class TestComponent extends Component {
+                constructor(props) {
+                    super(props)
+                    this.state = { count: 1 }
+                }
+
+                increase() {
+                    this.setState({
+                        count: this.state.count + 1
+                    })
+                }
+
                 render() {
                     return div({}, [
                         span({}, [
                             this.props.title
                         ]),
                         span({}, [
-                            'more child',
-                            'even more child'
-                        ])
+                            'current count: ' + this.state.count,
+                        ]),
+                        button({ onClick: () => this.increase() }, ['click for awesomeness'])
                     ])
                 }
             }
@@ -48,29 +59,33 @@
                 return e('div', prop, children);
             }
 
-            var span = function(prop, children) {
+            var span = function (prop, children) {
                 return e('span', prop, children);
             }
 
-            var button = function (prop) {
-                return e('button', prop);
+            var button = function (prop, children) {
+                return e('button', prop, children);
             }
 
-            var weatherWidget = function (prop) {
-                return div({ className: 'col-md-6 col-sm-6 col-xs-12' },
-                    [
-                        span({}, [
-                            "test",
-                            e('br'),
-                            e('i', {}, ["description"])
-                        ]),
-                        e(TestComponent, { title: 'blah blah title blah blah' }),
-                        e(TestContainer, {}, e('i', {}, ["container child"])),
-                        button({ onClick: () => alert('YOU DID IT!') })
-                    ]
-                );
-            };
-
+            class weatherWidget extends Component {
+                arbitraryUpdatingState() {
+                    this.setState({})
+                }
+                render() {
+                    return div({ className: 'col-md-6 col-sm-6 col-xs-12' },
+                        [
+                            span({}, [
+                                "test",
+                                e('br'),
+                                e('i', {}, ["description"])
+                            ]),
+                            e(TestComponent, { title: 'blah blah title blah blah' }),
+                            e(TestContainer, {}, e('i', {}, ["container child"])),
+                            button({ onClick: () => this.arbitraryUpdatingState() }, 'Update whole component')
+                        ]
+                    );
+                }
+            }
             r(e(weatherWidget),
                 document.getElementById(id));
         }
@@ -81,7 +96,7 @@
         } catch (error) {
             console.log(error)
         }
-        
+
         try {
             render(Inferno.createElement, Inferno.render, Inferno.Component, "InfernoApp");
         } catch (error) {

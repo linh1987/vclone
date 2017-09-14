@@ -1,29 +1,19 @@
 import * as DOM from './DOM'
 import VNode from './VNode'
-import Component from './Component'
+import { Component } from './Component'
+import { mount} from './Mount'
 
 
-var createElement = function (type: string | Function | Component, props: any, children: (VNode | string)[] | string): VNode {
+var createElement = function (type: string | Function | Component, props: any, children: (VNode | string)[] | string | VNode): VNode {
     props = props || {};
     props.children = children;
 
-    if (typeof type === 'string')
-        return new VNode(type, props, children);
-    else if (typeof type === 'function') { 
-        const composedNode = new (type as any)(props);
-        if (composedNode instanceof VNode) {
-            return composedNode;
-        } else if (composedNode instanceof Component) {
-            return composedNode.render()
-        }
-    }
-
-    throw "unknown type supplied: " + type;
+    return new VNode(type, props, children);
 }
 
 var render = function (vdom: VNode, el: Element) {
     DOM.empty(el);
-    el.appendChild(vdom.renderAsDOM());
+    el.appendChild(mount(vdom));
 }
 
 export { 
