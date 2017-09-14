@@ -24,6 +24,21 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/inferno-component/3.9.0/inferno-component.min.js"></script>
     <script>
         var render = function (e, r, Component, id) {
+
+            class ToggleComponent extends Component {
+                constructor(props) {
+                    super(props);
+                    this.state = {toggled: false};
+                }
+
+                render() {
+                    if (this.state.toggled === false) {
+                        return div({}, ['this is a div', button({onClick: () => this.setState({toggled: true})}, 'switch to span')]);
+                    }
+
+                    else return span({}, 'this is a span')
+                }
+            }
             class TestComponent extends Component {
                 constructor(props) {
                     super(props)
@@ -81,7 +96,8 @@
                             ]),
                             e(TestComponent, { title: 'blah blah title blah blah' }),
                             e(TestContainer, {}, e('i', {}, ["container child"])),
-                            button({ onClick: () => this.arbitraryUpdatingState() }, 'Update whole component')
+                            button({ onClick: () => this.arbitraryUpdatingState() }, 'Update whole component'),
+                            e(ToggleComponent)
                         ]
                     );
                 }

@@ -13,7 +13,7 @@ export default class VNode {
     }
 
     unmount() {
-        this.dom = null;
+        this.dom = null; //not working
     }
 
     update(nextProps: any, nextChildren: any) {
@@ -38,7 +38,7 @@ export default class VNode {
         if (typeof type === 'function') {
             const composedNode = new (type as any)(props);
             if ((composedNode as any).isComponentClass) {
-                this.dom = (composedNode as any).mountComponent()
+                this.dom = (composedNode as any).render().mount()
             } else
                 this.dom = (composedNode as VNode).mount();
         }

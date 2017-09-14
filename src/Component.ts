@@ -12,7 +12,7 @@ class Component {
 
     setState(nextState) {
         this.state = nextState;
-        this.updateComponent();
+        // this.updateComponent();
     }
     
     mountComponent() : Element {
@@ -23,12 +23,15 @@ class Component {
     }
 
     updateComponent() {
+        
         let newNode = this.render();
-
+        console.log(newNode);
+        console.log(this.node);
         if (newNode.type !== this.node.type) {
             console.log('reseting type');
             this.node.dom.replaceWith(newNode.mount())
         } else {
+            console.log('updating dom');
             this.node.update(newNode.props, newNode.children)
         }
         

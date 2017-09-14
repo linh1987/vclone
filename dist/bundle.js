@@ -27,7 +27,7 @@ var VNode = (function () {
         this.children = children;
     }
     VNode.prototype.unmount = function () {
-        this.dom = null;
+        this.dom = null; //not working
     };
     VNode.prototype.update = function (nextProps, nextChildren) {
         this.children = nextChildren;
@@ -45,7 +45,7 @@ var VNode = (function () {
         if (typeof type === 'function') {
             var composedNode = new type(props);
             if (composedNode.isComponentClass) {
-                this.dom = composedNode.mountComponent();
+                this.dom = composedNode.render().mount();
             }
             else
                 this.dom = composedNode.mount();
@@ -112,7 +112,7 @@ var Component = (function () {
     }
     Component.prototype.setState = function (nextState) {
         this.state = nextState;
-        this.updateComponent();
+        // this.updateComponent();
     };
     Component.prototype.mountComponent = function () {
         var node = this.render();
@@ -121,11 +121,14 @@ var Component = (function () {
     };
     Component.prototype.updateComponent = function () {
         var newNode = this.render();
+        console.log(newNode);
+        console.log(this.node);
         if (newNode.type !== this.node.type) {
             console.log('reseting type');
             this.node.dom.replaceWith(newNode.mount());
         }
         else {
+            console.log('updating dom');
             this.node.update(newNode.props, newNode.children);
         }
     };
@@ -147,6 +150,7 @@ var createElement = function (type, props, children) {
 };
 var render = function (vdom, el) {
     empty(el);
+    console.log(vdom);
     el.appendChild(mount(vdom));
 };
 

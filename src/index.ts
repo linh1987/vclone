@@ -13,7 +13,9 @@ var createElement = function (type: string | Function | Component, props: any, c
 
 var render = function (vdom: VNode, el: Element) {
     DOM.empty(el);
-    el.appendChild(mount(vdom));
+
+    console.log(vdom)
+    el.appendChild(vdom.mount());
 }
 
 export { 
