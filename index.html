@@ -28,18 +28,17 @@
             class ToggleComponent extends Component {
                 constructor(props) {
                     super(props);
-                    this.state = {toggled: false};
+                    this.state = { toggled: false };
                 }
 
                 render() {
                     if (this.state.toggled === false) {
-                        return div({}, ['this is a div', button({onClick: () => this.setState({toggled: true})}, 'switch to span')]);
+                        return div({}, ['this is a div', button({ onClick: () => this.setState({ toggled: true }) }, 'switch to span')]);
                     }
 
                     else return span({}, 'this is a span')
                 }
             }
-            
             class TestComponent extends Component {
                 constructor(props) {
                     super(props)
@@ -62,6 +61,12 @@
                         ]),
                         button({ onClick: () => this.increase() }, ['click for awesomeness'])
                     ])
+                }
+            }
+
+            class TestContainer extends Component {
+                render() {
+                    return div({}, this.props.children)
                 }
             }
 

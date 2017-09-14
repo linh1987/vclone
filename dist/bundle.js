@@ -8,7 +8,6 @@ function empty(node) {
 function removeProperty(node, attr) {
     node.removeAttribute(attr);
 }
-//# sourceMappingURL=DOM.js.map
 
 function mapEvent(eventName) {
     switch (eventName.toLowerCase()) {
@@ -18,7 +17,6 @@ function mapEvent(eventName) {
             return 'unknown';
     }
 }
-//# sourceMappingURL=Events.js.map
 
 var VNode = (function () {
     function VNode(type, props, children) {
@@ -138,11 +136,6 @@ var Component = (function () {
     return Component;
 }());
 
-var mount = function (node) {
-    return node.mount();
-};
-//# sourceMappingURL=Mount.js.map
-
 var createElement = function (type, props, children) {
     props = props || {};
     props.children = children;
@@ -151,7 +144,7 @@ var createElement = function (type, props, children) {
 var render = function (vdom, el) {
     empty(el);
     console.log(vdom);
-    el.appendChild(mount(vdom));
+    el.appendChild(vdom.mount());
 };
 
 exports.Component = Component;
