@@ -8,6 +8,93 @@ function empty(node) {
 function removeProperty(node, attr) {
     node.removeAttribute(attr);
 }
+//# sourceMappingURL=DOM.js.map
+
+var VNode = (function () {
+    function VNode(type, props) {
+        this.type = type;
+        this.props = props;
+        this.children = props.children;
+    }
+    return VNode;
+}());
+
+var hostComponentImplementation = null;
+function construct(node) {
+    return new hostComponentImplementation(node);
+}
+function injectImplementation(implemetation) {
+    hostComponentImplementation = implemetation;
+}
+//# sourceMappingURL=HostComponent.js.map
+
+function initializeNode(node) {
+    try {
+        var type = node.type;
+        var props = node.props;
+        if (typeof type === "string") {
+            return construct(node);
+        }
+        if (typeof type === 'function') {
+            var composedNode = new type(props);
+            if (composedNode.isComponentClass) {
+                composedNode.currentNode = node;
+                return composedNode; //
+            }
+            else
+                return construct(composedNode);
+        }
+    }
+    catch (error) {
+        console.log(node);
+    }
+}
+//# sourceMappingURL=initializeNode.js.map
+
+var Component = (function () {
+    function Component(props) {
+        this.props = null;
+        this.state = null;
+        this.currentNode = null;
+        this.renderedNode = null;
+        this.renderedComponent = null;
+        this.isComponentClass = true;
+        this.dom = null;
+        this.props = props;
+    }
+    Component.prototype.setState = function (nextState) {
+        this.state = nextState;
+        this.update(this.currentNode, this.currentNode);
+    };
+    Component.prototype.mount = function () {
+        this.renderedNode = this.render();
+        this.renderedComponent = initializeNode(this.renderedNode);
+        this.dom = this.renderedComponent.mount();
+        return this.dom;
+    };
+    Component.prototype.update = function (prevNode, nextNode) {
+        this.props = nextNode.props;
+        this.currentNode = nextNode;
+        var nextRenderedNode = this.render();
+        if (nextRenderedNode.type === this.renderedNode.type) {
+            this.renderedComponent.receive(nextRenderedNode);
+        }
+        else {
+            var newRenderedComponent = initializeNode(this.currentNode);
+            this.renderedComponent.dom.replaceWith(newRenderedComponent.mount());
+            this.renderedComponent = newRenderedComponent;
+            this.dom = this.renderedComponent.dom;
+        }
+        this.renderedNode = nextRenderedNode;
+    };
+    Component.prototype.receive = function (nextNode) {
+        this.update(this.currentNode, nextNode);
+    };
+    Component.prototype.render = function () {
+        throw "Not implemented exception";
+    };
+    return Component;
+}());
 
 function mapEvent(eventName) {
     switch (eventName.toLowerCase()) {
@@ -17,44 +104,33 @@ function mapEvent(eventName) {
             return 'unknown';
     }
 }
+//# sourceMappingURL=Events.js.map
 
-var VNode = (function () {
-    function VNode(type, props, children) {
-        this.type = type;
-        this.props = props;
-        this.children = children;
+var DOMVNodeWrapper = (function () {
+    function DOMVNodeWrapper(node) {
+        this.currentNode = node;
+        this.dom = null;
     }
-    VNode.prototype.unmount = function () {
-        this.dom = null; //not working
+    DOMVNodeWrapper.prototype.receive = function (nextNode) {
+        this.update(this.currentNode, nextNode);
     };
-    VNode.prototype.update = function (nextProps, nextChildren) {
-        this.children = nextChildren;
-        this.mountProperties(this.props, nextProps);
+    DOMVNodeWrapper.prototype.update = function (prevNode, nextNode) {
+        this.currentNode = nextNode;
+        this.mountProperties({}, this.currentNode.props);
         empty(this.dom);
         this.mountChildren();
-        this.props = nextProps;
     };
-    VNode.prototype.mount = function () {
-        var type = this.type;
-        var props = this.props;
-        if (typeof type === "string") {
-            this.dom = this.renderAsDOM(type, props);
-        }
-        if (typeof type === 'function') {
-            var composedNode = new type(props);
-            if (composedNode.isComponentClass) {
-                this.dom = composedNode.render().mount();
-            }
-            else
-                this.dom = composedNode.mount();
-        }
+    DOMVNodeWrapper.prototype.mount = function () {
+        var type = this.currentNode.type;
+        var props = this.currentNode.props;
+        this.dom = this.renderAsDOM(type, props);
         this.mountProperties({}, props);
         this.mountChildren();
         return this.dom;
     };
-    VNode.prototype.mountChildren = function () {
+    DOMVNodeWrapper.prototype.mountChildren = function () {
         var _this = this;
-        var children = this.children;
+        var children = this.currentNode.children;
         if (!children)
             children = [];
         if (typeof children === 'string' || children instanceof VNode)
@@ -62,17 +138,16 @@ var VNode = (function () {
         children.forEach(function (child) {
             var el = null;
             if (typeof child === 'string') {
-                var spanWrapper = document.createElement('span');
-                spanWrapper.textContent = child;
-                el = spanWrapper;
+                el = _this.renderAsDOM("span", {});
+                el.textContent = child;
             }
             else {
-                el = child.mount();
+                el = initializeNode(child).mount();
             }
             _this.dom.appendChild(el);
         });
     };
-    VNode.prototype.mountProperties = function (prevProps, currentProps) {
+    DOMVNodeWrapper.prototype.mountProperties = function (prevProps, currentProps) {
         var _this = this;
         Object.keys(prevProps).forEach(function (key) {
             removeProperty(_this.dom, key);
@@ -92,59 +167,23 @@ var VNode = (function () {
             }
         });
     };
-    VNode.prototype.renderAsDOM = function (type, props) {
+    DOMVNodeWrapper.prototype.renderAsDOM = function (type, props) {
         var renderedDOM = null;
         renderedDOM = document.createElement(type);
         return renderedDOM;
     };
-    return VNode;
+    return DOMVNodeWrapper;
 }());
 
-var Component = (function () {
-    function Component(props) {
-        this.props = null;
-        this.state = null;
-        this.node = null;
-        this.isComponentClass = true;
-        this.props = props;
-    }
-    Component.prototype.setState = function (nextState) {
-        this.state = nextState;
-        // this.updateComponent();
-    };
-    Component.prototype.mountComponent = function () {
-        var node = this.render();
-        this.node = node;
-        return node.mount();
-    };
-    Component.prototype.updateComponent = function () {
-        var newNode = this.render();
-        console.log(newNode);
-        console.log(this.node);
-        if (newNode.type !== this.node.type) {
-            console.log('reseting type');
-            this.node.dom.replaceWith(newNode.mount());
-        }
-        else {
-            console.log('updating dom');
-            this.node.update(newNode.props, newNode.children);
-        }
-    };
-    Component.prototype.render = function () {
-        throw "Not implemented exception";
-    };
-    return Component;
-}());
-
+injectImplementation(DOMVNodeWrapper);
 var createElement = function (type, props, children) {
     props = props || {};
     props.children = children;
-    return new VNode(type, props, children);
+    return new VNode(type, props);
 };
 var render = function (vdom, el) {
     empty(el);
-    console.log(vdom);
-    el.appendChild(vdom.mount());
+    el.appendChild(initializeNode(vdom).mount());
 };
 
 exports.Component = Component;

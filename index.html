@@ -39,6 +39,47 @@
                     else return span({}, 'this is a span')
                 }
             }
+
+            class AnotherTestComponent extends Component {
+                constructor(props) {
+                    super(props)
+                    this.state = { count: 1 }
+                }
+
+                increase() {
+                    this.setState({
+                        count: this.state.count + 1
+                    })
+                }
+
+                isEven(n) {
+                    return n % 2 == 0;
+                }
+
+                render() {
+                    if (this.isEven(this.props.parentCount))
+                        return div({}, [
+                            span({}, [
+                                'current count: ' + this.state.count,
+                            ]),
+                            span({}, [
+                                'current parent count: ' + this.props.parentCount,
+                            ]),
+                            button({ onClick: () => this.increase() }, ['child of awesomeness clicker'])
+                        ])
+                    else 
+                        return span({}, [
+                            span({}, [
+                                'current count: ' + this.state.count,
+                            ]),
+                            span({}, [
+                                'current parent count: ' + this.props.parentCount,
+                            ]),
+                            button({ onClick: () => this.increase() }, ['child of awesomeness clicker'])
+                        ])
+                }
+            } 
+
             class TestComponent extends Component {
                 constructor(props) {
                     super(props)
@@ -59,7 +100,8 @@
                         span({}, [
                             'current count: ' + this.state.count,
                         ]),
-                        button({ onClick: () => this.increase() }, ['click for awesomeness'])
+                        button({ onClick: () => this.increase() }, ['click for awesomeness']),
+                        e(AnotherTestComponent, { parentCount: this.state.count })
                     ])
                 }
             }
