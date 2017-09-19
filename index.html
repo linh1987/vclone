@@ -68,12 +68,15 @@
                             button({ onClick: () => this.increase() }, ['child of awesomeness clicker'])
                         ])
                     else 
-                        return span({}, [
+                        return div({}, [
                             span({}, [
                                 'current count: ' + this.state.count,
                             ]),
                             span({}, [
                                 'current parent count: ' + this.props.parentCount,
+                            ]),
+                            span({}, [
+                                'current parent count2: ' + this.props.parentCount,
                             ]),
                             button({ onClick: () => this.increase() }, ['child of awesomeness clicker'])
                         ])

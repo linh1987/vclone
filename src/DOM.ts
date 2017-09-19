@@ -6,3 +6,6 @@ export function empty(node: Element) {
 export function removeProperty(node, attr) {
     node.removeAttribute(attr);
 }
+export function removeChild(node, child) {
+    node.removeChild(child);
+}

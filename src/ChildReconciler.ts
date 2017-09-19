@@ -1,28 +1,20 @@
+import initializeNode from './initializeNode'
+
 const SEPARATOR = '.';
 const SUBSEPARATOR = ':';
-
-//flatten all children 
-// {
-//      '.': , //parent component
-//      '.0': //first child
-//      '.0.0': //child of first child
-//      '.0.1': //2nd child of first child
-//      '.1': //second child    
-// }
 
 function traverseChildrenTree(children, currentPrefix, context) {
     if (!children)
         return;
         
-    if (!Array.isArray(children)) {
+    if (typeof children === 'string' || !Array.isArray(children)) {
         let childName = currentPrefix + SEPARATOR + "0";
-        context[childName] = children;
+        context[childName] = initializeNode(children);
         return;
     }
 
     children.forEach((child, index) => {
         let childName = currentPrefix + SEPARATOR + index;
-        context[childName] = child;
 
         traverseChildrenTree(child, childName, context)
     })

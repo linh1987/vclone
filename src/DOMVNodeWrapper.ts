@@ -3,12 +3,13 @@ import { mapEvent } from './Events'
 import * as DOM from './DOM'
 import { IMountable } from './IMountable';
 import initializeNode from './initializeNode'
+import { flattenChildren } from './ChildReconciler'
 
 export class DOMVNodeWrapper implements IMountable {
     dom: Element;
     currentNode: VNode;
-    currentChildren: IMountable[];
-    
+    renderedChildren: any;
+
     constructor(node: VNode) {
         this.currentNode = node;
         this.dom = null;
@@ -20,10 +21,10 @@ export class DOMVNodeWrapper implements IMountable {
 
     update(prevNode, nextNode) {
         this.currentNode = nextNode;
-        this.mountProperties({}, this.currentNode.props);
-        DOM.empty(this.dom)
-        
-        this.mountChildren();
+        //this.mountProperties({}, this.currentNode.props);
+        //DOM.empty(this.dom)
+
+        this.updateChildren(nextNode.children);
     }
 
     mount(): Element {
@@ -33,32 +34,68 @@ export class DOMVNodeWrapper implements IMountable {
         this.dom = this.renderAsDOM(type as string, props)
 
         this.mountProperties({}, props);
-        this.mountChildren();
+        this.mountInitialChildren();
 
         return this.dom;
     }
 
-    private mountChildren() {
-        let children = this.currentNode.children;
+    private updateChildren(nextChildren) {
+        let prevRenderedChildren = this.renderedChildren || {};
+        let nextRenderedChildren = flattenChildren(nextChildren);
+        this.renderedChildren = nextRenderedChildren
 
-        if (!children)
-            children = [];
+        Object.keys(nextRenderedChildren).forEach((childKey) => {
+            let prevChild = null;
 
-        if (typeof children === 'string' || children instanceof VNode)
-            children = [children];
+            if (prevRenderedChildren.hasOwnProperty(childKey))
+                prevChild = prevRenderedChildren[childKey] as IMountable;
+            let nextChild = nextRenderedChildren[childKey] as IMountable;
 
-        children.forEach((child) => {
-            let el: Element = null;
-            if (typeof child === 'string') {
-                el = this.renderAsDOM("span", {});
-                el.textContent = child;
+
+            if (prevChild && prevChild.currentNode.type !== nextChild.currentNode.type) {
+                prevChild.dom.replaceWith(nextChild.mount());
+            } else {
+                if (prevChild) {
+                    prevChild.receive(nextChild.currentNode)
+                    nextRenderedChildren[childKey] = prevChild;
+                } else {
+                    let renderedNextChild = nextChild.mount();
+                    if (!(nextChild as any).renderedChildren) {
+                        //text node
+                        this.dom.textContent = nextChild.dom.textContent;
+                        this.renderedChildren = null; 
+                    }
+                    else {
+                        //new component
+                        this.dom.appendChild(nextChild.mount());
+                    }
+                }
             }
-            else {
-                el = initializeNode(child).mount();
-            }
+        });
 
-            this.dom.appendChild(el);
+        Object.keys(prevRenderedChildren).forEach((childKey) => {
+            if (!nextRenderedChildren.hasOwnProperty(childKey)) {
+                DOM.removeChild(this.dom, prevRenderedChildren[childKey].dom)
+            }
         })
+    }
+
+    private mountInitialChildren() {
+        //short circuit here
+        if (typeof this.currentNode.children === 'string') {
+            this.dom.textContent = this.currentNode.children;
+        }
+        else {
+            let flattenedChildren = flattenChildren(this.currentNode.children)
+
+            Object.keys(flattenedChildren).forEach((childKey, index) => {
+                let child = flattenedChildren[childKey];
+                child._mountIndex = index;
+                this.dom.appendChild(child.mount());
+            })
+
+            this.renderedChildren = flattenedChildren;
+        }
     }
 
     private mountProperties(prevProps, currentProps) {
@@ -75,7 +112,6 @@ export class DOMVNodeWrapper implements IMountable {
 
             if (currentKey === 'className')
                 currentKey = 'class';
-
 
             if (typeof currentValue === 'function') {
                 this.dom.addEventListener(mapEvent(currentKey), currentValue);

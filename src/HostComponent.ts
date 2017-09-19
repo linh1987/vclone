@@ -7,6 +7,10 @@ export function construct(node: VNode) {
     return new hostComponentImplementation(node);
 }
 
+export function constructTextNode(string) {
+    return construct(new VNode('span', { children: string}));
+}
+
 export function injectImplementation(implemetation: any) {
     hostComponentImplementation = implemetation;
 }
